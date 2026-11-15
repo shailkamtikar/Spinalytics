@@ -311,12 +311,12 @@ Do not commit: `frontend/node_modules/`, `frontend/dist/`. Do commit `package-lo
 
 | Item | Record |
 |---|---|
-| Completed milestones | 0.1 ☐ 0.2 ☐ 0.3 ☐ |
-| Tests passed | __ / 19 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | Fresh clone into a new folder → install → both servers start → page shows "API: ok" ☐ |
-| Go / No-Go | Go only if all 19 pass and no secret is in history |
+| Completed milestones | 0.1 ☑ 0.2 ☑ 0.3 ☑ |
+| Tests passed | 19 / 19 |
+| Known issues | None. Note: T-0.2-03 was run by starting the server with an empty `GEMINI_API_KEY` environment variable instead of renaming `.env`. |
+| Git commit / hash | `e79638d` (tag `m0.3`) |
+| Overall phase verification | Fresh clone into a new folder → install → backend tests 3 passed, frontend tests 2 passed, build succeeded; page shows "API: ok" with the backend up and "API: unreachable" with it down ☑ |
+| Go / No-Go | **Go** for Phase 1. No secret, dataset or dependency folder is tracked. |
 
 ```powershell
 git checkout main
