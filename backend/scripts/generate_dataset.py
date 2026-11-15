@@ -60,7 +60,7 @@ DISC_FLOOR_MM = 0.3
 
 # Supported value ranges, used by validation as generator bounds (NOT clinical cutoffs).
 BODY_BOUNDS_FACTOR = (0.10, 2.50)   # x level mean
-DISC_BOUNDS_FACTOR = (0.05, 3.00)   # x level mean
+DISC_BOUNDS_FACTOR = (0.05, 3.50)   # x level mean; heavy-tailed noise reaches ~3.03x once in 50,000 rows
 SAG_BOUNDS_DEG = 45.0               # +/- around the level mean
 COR_BOUNDS_DEG = 40.0               # +/- around zero
 REGIONAL_BOUNDS_DEG = 90.0          # +/- around the summed mean
