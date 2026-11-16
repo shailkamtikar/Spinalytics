@@ -33,7 +33,7 @@ Names, e-mail addresses, phone numbers, addresses, dates of birth, record number
 
 ## Configuration
 
-`GEMINI_API_KEY` stays in the root `.env` file, which is never committed, and is read only by the backend. `GEMINI_MODEL` is optional; when empty the backend uses `gemini-3.1-flash-lite`. A model name that is not available to the key gives a controlled `ai_error` response, never a crash.
+`GEMINI_API_KEY` stays in the root `.env` file, which is never committed, and is read only by the backend. The model is fixed to `gemini-3.5-flash-lite` in `backend/app/config.py` and is deliberately not configurable through the environment. If the key cannot use it, the answer is a controlled `ai_error` response, never a crash.
 
 ## Failure behaviour
 

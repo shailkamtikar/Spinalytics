@@ -50,7 +50,7 @@ test('selection is shared: level list, details panel, table and 2D map agree', a
   await expect(page.getByRole('heading', { name: 'L4-L5' })).toBeVisible()
   await expect(page.getByTestId('findings-table').locator('tr[aria-selected="true"]').first()).toHaveAttribute('data-level', 'L4-L5')
   await page.keyboard.press('Escape')
-  await expect(page.getByRole('heading', { name: 'Nothing selected' })).toBeVisible()
+  await expect(page.getByTestId('level-summary')).toHaveCount(0)
   await page.getByTestId('findings-table').locator('tr[data-level="C3"]').first().click()
   await expect(page.getByRole('heading', { name: 'C3' })).toBeVisible()
 })
