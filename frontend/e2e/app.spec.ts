@@ -129,3 +129,32 @@ test('all eight sample cases give the expected overall state through the API', a
     expect((await res.json()).overall.state, c.case_id).toBe(expected[i])
   }
 })
+
+test('clicking a part in the 3D spine opens its panel beside the figure and keeps the page in place', async ({ page }) => {
+  await analyseSample(page, 2)
+  const stage = page.locator('section[aria-label="Interactive spine"]')
+  await stage.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(800)
+  const canvas = page.locator('[data-figure="3d"] canvas')
+  const box = (await canvas.boundingBox())!
+  const before = await page.evaluate(() => scrollY)
+  let title = ''
+  for (let fy = 0.15; fy < 0.9 && !title; fy += 0.04) {
+    for (const fx of [0.4, 0.46, 0.52]) {
+      await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy)
+      await page.waitForTimeout(100)
+      if (await page.getByTestId('level-summary').count()) {
+        title = await page.getByTestId('level-summary').locator('h2').innerText()
+        break
+      }
+    }
+  }
+  expect(title).toMatch(/^[CTL]\d{1,2}(-[CTLS]\d{1,2})?$/)
+  const panel = (await page.getByTestId('level-summary').boundingBox())!
+  expect(panel.x).toBeGreaterThan(box.x + box.width - 4) // beside the figure, not over it
+  expect(Math.abs((await page.evaluate(() => scrollY)) - before)).toBeLessThan(40) // the page did not jump
+  await page.getByRole('button', { name: /^Next part/ }).click()
+  await expect(page.getByTestId('level-summary').locator('h2')).not.toHaveText(title)
+  await page.keyboard.press('Escape')
+  await expect(page.getByTestId('level-overview')).toBeVisible()
+})

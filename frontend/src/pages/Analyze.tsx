@@ -1,7 +1,9 @@
+import { motion } from 'motion/react'
 import { useCallback, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AnalyzeRequest, SampleCase } from '../api/client'
 import { ErrorPanel } from '../components/feedback/Feedback'
+import { EASE, RevealWords } from '../components/fx'
 import { Label } from '../components/ui'
 import { CsvUpload } from '../features/input/csv/CsvUpload'
 import { ManualForm } from '../features/input/manual/ManualForm'
@@ -55,7 +57,7 @@ export default function Analyze() {
     <div className="mx-auto max-w-[1280px] px-6 py-14 lg:px-10">
       <Label>Step 1 of 2 · Input</Label>
       <h1 className="mt-4 text-5xl">
-        Bring in a <em className="text-accent">spine</em>.
+        <RevealWords parts={[{ text: 'Bring in a' }, { text: 'spine', accent: true }, { text: '.' }]} />
       </h1>
       <p className="mt-4 max-w-prose text-muted">Choose how to provide measurements. Every route ends in the same review step before anything is analysed.</p>
       {notice && (
@@ -74,20 +76,21 @@ export default function Analyze() {
             aria-selected={tab === t.id}
             aria-controls={`panel-${t.id}`}
             onClick={() => switchTab(t.id)}
-            className={`-mb-px border-b-2 px-4 py-2.5 font-mono text-[0.78rem] uppercase tracking-[0.14em] ${tab === t.id ? 'border-accent text-text' : 'border-transparent text-muted hover:text-text'}`}
+            className={`press relative -mb-px px-4 py-2.5 font-mono text-[0.78rem] uppercase tracking-[0.14em] transition-colors ${tab === t.id ? 'text-text' : 'text-muted hover:text-text'}`}
           >
             {t.label}
+            {tab === t.id && <motion.span layoutId="input-tab" className="absolute inset-x-0 -bottom-px h-0.5 bg-accent" transition={{ duration: 0.35, ease: EASE }} />}
           </button>
         ))}
       </div>
 
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-8">
+      <motion.div key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE }} role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-8">
         {tab === 'sample' && <SampleCasePicker onPick={onSample} />}
         {tab !== 'sample' && catalogError && <ErrorPanel error={catalogError as never} onRetry={retry} />}
         {tab !== 'sample' && !catalog && !catalogError && <p role="status" className="font-mono text-sm text-muted">Loading the measurement catalog…</p>}
         {tab === 'csv' && catalog && <CsvUpload catalog={catalog} onChange={onCsv} />}
         {tab === 'manual' && catalog && <ManualForm catalog={catalog} onChange={onManual} />}
-      </div>
+      </motion.div>
 
       {catalog && pending && <ReviewPanel request={pending.request} catalog={catalog} notes={pending.notes} blockers={pending.blockers} onAnalyse={analyse} />}
       {!catalog && tab === 'sample' && pending && <p className="mt-6 font-mono text-sm text-muted">Preparing the review…</p>}

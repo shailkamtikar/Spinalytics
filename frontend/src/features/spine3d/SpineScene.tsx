@@ -35,21 +35,26 @@ function geometries() {
   return shared
 }
 
-function Element({ item, color, selected, spreadValue, interactive, onSelect, onHover }: { item: SpineItem; color: string; selected: boolean; spreadValue?: MotionValue<number>; interactive: boolean; onSelect?: (l: string | null) => void; onHover: (l: string | null) => void }) {
+/** How far a selected part slides toward the viewer. The camera aims at the part after this shift. */
+const pullForward = (item: SpineItem) => item.size.depth * 0.9
+
+function Element({ item, color, selected, hovered, spreadValue, interactive, onSelect, onHover }: { item: SpineItem; color: string; selected: boolean; hovered: boolean; spreadValue?: MotionValue<number>; interactive: boolean; onSelect?: (l: string | null) => void; onHover: (l: string | null) => void }) {
   const group = useRef<THREE.Group>(null)
   const g = geometries()
   const { height: h, width: w, depth: d } = item.size
   const faint = !item.measured
-  const material = { color, roughness: 0.72, metalness: 0.05, transparent: faint, opacity: faint ? 0.3 : 1, wireframe: faint, emissive: selected ? color : 'black', emissiveIntensity: selected ? 0.35 : 0 }
+  const glow = selected ? 0.4 : hovered ? 0.22 : 0
+  const material = { color, roughness: 0.72, metalness: 0.05, transparent: faint, opacity: faint ? 0.3 : 1, wireframe: faint, emissive: glow ? color : 'black', emissiveIntensity: glow }
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const el = group.current
     if (!el) return
     const t = spreadValue ? spreadValue.get() : 0
-    const tx = THREE.MathUtils.lerp(item.position[0], item.spreadPosition[0], t) + (selected ? d * 0.9 : 0)
+    const k = 1 - Math.exp(-delta * 9)
+    const tx = THREE.MathUtils.lerp(item.position[0], item.spreadPosition[0], t) + (selected ? pullForward(item) : 0)
     const ty = THREE.MathUtils.lerp(item.position[1], item.spreadPosition[1], t)
-    el.position.x += (tx - el.position.x) * 0.18
-    el.position.y += (ty - el.position.y) * 0.5
+    el.position.x += (tx - el.position.x) * k
+    el.position.y += (ty - el.position.y) * (spreadValue ? 0.5 : k)
   })
 
   const handlers = interactive
@@ -98,33 +103,60 @@ function Element({ item, color, selected, spreadValue, interactive, onSelect, on
   )
 }
 
-/** Moves the camera and orbit target together, so selecting a level pans rather than rotates. */
-function CameraRig({ layout, selected, apiRef, controls }: { layout: SpineLayout; selected: string | null; apiRef?: MutableRefObject<ViewApi | null>; controls: MutableRefObject<OrbitControlsImpl | null> }) {
-  const { camera } = useThree()
-  const home = useMemo(() => new THREE.Vector3(0, 0, homeDistance(layout)), [layout])
-  const wanted = useRef(new THREE.Vector3())
-  const animUntil = useRef(0)
+/** Far enough that the whole spine fits a tall, narrow canvas with some air around it. */
+function homeDistance(layout: SpineLayout): number {
+  return layout.height * 1.75
+}
 
-  // every selection change starts a short camera move: pan to the part and zoom in on it (or back out when cleared)
+/**
+ * Camera director. A selection flies the camera straight to that part, side-on, close enough that the part fills
+ * the middle of the canvas. Clearing the selection flies back out. While it flies the orbit controls are paused;
+ * once it lands the reader is free to orbit, zoom and pan again.
+ */
+function CameraRig({ layout, selected, apiRef, controls }: { layout: SpineLayout; selected: string | null; apiRef?: MutableRefObject<ViewApi | null>; controls: MutableRefObject<OrbitControlsImpl | null> }) {
+  const { camera, size } = useThree()
+  const flying = useRef(false)
+  const goal = useRef({ target: new THREE.Vector3(), position: new THREE.Vector3(0, 0, homeDistance(layout)) })
+  const home = useMemo(() => new THREE.Vector3(0, 0, homeDistance(layout)), [layout])
+  const first = useRef(true)
+
+  // a new selection sets a new goal and starts the flight
   useEffect(() => {
-    animUntil.current = performance.now() + 1600
-  }, [selected])
+    const item = selected ? layout.items.find((i) => i.level === selected) : null
+    const cam = camera as THREE.PerspectiveCamera
+    const half = Math.tan((cam.fov * Math.PI) / 360)
+    if (item) {
+      const aspect = size.width / Math.max(1, size.height)
+      const needV = Math.max(item.size.height * 3.4, item.size.width * 2.0, 0.9) // world height that should be visible
+      const needH = (item.size.width + item.size.depth * 2.4) * 1.9 / aspect // keep the part inside a narrow canvas too
+      const dist = Math.max(needV, needH) / 2 / half
+      const target = new THREE.Vector3(item.position[0] + pullForward(item), item.position[1], 0)
+      goal.current = { target, position: new THREE.Vector3(target.x, target.y, dist) }
+    } else {
+      goal.current = { target: new THREE.Vector3(0, 0, 0), position: home.clone() }
+    }
+    if (first.current) {
+      first.current = false
+      if (!item) return // initial mount with nothing selected: stay at the starting pose
+    }
+    flying.current = true
+    if (controls.current) controls.current.enabled = false
+  }, [selected, layout, camera, size.width, size.height, home, controls])
 
   useEffect(() => {
     if (!apiRef) return
     apiRef.current = {
       reset: () => {
-        camera.position.copy(home)
-        controls.current?.target.set(0, 0, 0)
-        controls.current?.update()
+        goal.current = { target: new THREE.Vector3(0, 0, 0), position: home.clone() }
+        flying.current = true
+        if (controls.current) controls.current.enabled = false
       },
       fit: () => {
-        const fov = ((camera as THREE.PerspectiveCamera).fov * Math.PI) / 180
-        const distance = (layout.height / 2 / Math.tan(fov / 2)) * 1.12
-        const dir = camera.position.clone().sub(controls.current?.target ?? new THREE.Vector3()).normalize()
-        controls.current?.target.set(0, 0, 0)
-        camera.position.copy(dir.multiplyScalar(distance))
-        controls.current?.update()
+        const cam = camera as THREE.PerspectiveCamera
+        const dist = (layout.height / 2 / Math.tan((cam.fov * Math.PI) / 360)) * 1.12
+        goal.current = { target: new THREE.Vector3(0, 0, 0), position: new THREE.Vector3(0, 0, dist) }
+        flying.current = true
+        if (controls.current) controls.current.enabled = false
       },
     }
     return () => {
@@ -132,32 +164,22 @@ function CameraRig({ layout, selected, apiRef, controls }: { layout: SpineLayout
     }
   }, [apiRef, camera, home, layout, controls])
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const c = controls.current
-    if (!c) return
-    const item = selected ? layout.items.find((i) => i.level === selected) : null
-    wanted.current.set(item ? item.position[0] : 0, item ? item.position[1] : 0, 0)
-    const delta = wanted.current.clone().sub(c.target)
-    if (performance.now() > animUntil.current) return // after the move the reader is free to orbit, zoom and pan
-    const dist = camera.position.distanceTo(c.target)
-    const desired = item ? Math.max(2.2, item.size.width * 2.4) : homeDistance(layout)
-    if (Math.abs(dist - desired) > 0.01) {
-      const dir = camera.position.clone().sub(c.target).normalize()
-      camera.position.copy(c.target).addScaledVector(dir, dist + (desired - dist) * 0.1)
-    }
-    if (delta.lengthSq() > 1e-6) {
-      delta.multiplyScalar(0.08)
-      c.target.add(delta)
-      camera.position.add(delta)
+    if (!c || !flying.current) return
+    const k = 1 - Math.exp(-delta * 5.5)
+    c.target.lerp(goal.current.target, k)
+    camera.position.lerp(goal.current.position, k)
+    c.update()
+    if (c.target.distanceTo(goal.current.target) < 0.004 && camera.position.distanceTo(goal.current.position) < 0.008) {
+      c.target.copy(goal.current.target)
+      camera.position.copy(goal.current.position)
+      flying.current = false
+      c.enabled = true
       c.update()
     }
   })
   return null
-}
-
-/** Far enough that the whole spine fits a tall, narrow canvas with some air around it. */
-function homeDistance(layout: SpineLayout): number {
-  return layout.height * 1.75
 }
 
 export default function SpineScene({ layout, statuses, selected = null, onSelect, spreadValue, interactive = true, orbit = true, apiRef, className }: SceneProps) {
@@ -185,20 +207,21 @@ export default function SpineScene({ layout, statuses, selected = null, onSelect
           item={item}
           color={colorForLevel(colors, item.measured, statuses?.[item.level])}
           selected={selected === item.level}
+          hovered={hovered === item.level}
           spreadValue={spreadValue}
           interactive={interactive}
           onSelect={onSelect}
           onHover={setHovered}
         />
       ))}
-      {hoveredItem && (
+      {hoveredItem && hovered !== selected && (
         <Html position={[hoveredItem.position[0] + hoveredItem.size.depth + 0.5, hoveredItem.position[1], 0]} style={{ pointerEvents: 'none' }}>
           <div className="whitespace-nowrap rounded-sm border border-rule bg-surface px-2 py-1 font-mono text-xs text-text">
-            {hoveredItem.level} · {hoveredItem.measured ? (statuses?.[hoveredItem.level] ? statusWord(statuses[hoveredItem.level]).toLowerCase() : 'reference shape') : 'not measured'}
+            {hoveredItem.level} · {hoveredItem.measured ? (statuses?.[hoveredItem.level] ? statusWord(statuses[hoveredItem.level]).toLowerCase() : 'reference shape') : 'not measured'} · click to zoom
           </div>
         </Html>
       )}
-      <OrbitControls ref={controls as never} makeDefault enabled={orbit} enableDamping dampingFactor={0.12} enablePan minDistance={2} maxDistance={layout.height * 3.5} target={[0, 0, 0]} />
+      <OrbitControls ref={controls as never} makeDefault enabled={orbit} enableDamping dampingFactor={0.12} enablePan minDistance={1.4} maxDistance={layout.height * 3.5} />
       <CameraRig layout={layout} selected={selected} apiRef={apiRef} controls={controls} />
     </Canvas>
   )

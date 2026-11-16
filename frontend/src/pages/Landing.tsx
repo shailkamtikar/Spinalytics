@@ -1,9 +1,10 @@
-import { useMotionValue, useMotionValueEvent, useScroll, useTransform } from 'motion/react'
+import { motion, useMotionValue, useMotionValueEvent, useScroll, useTransform } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import type { ReferenceInfo } from '../api/client'
 import { SpineSchematic } from '../components/spine/SpineSchematic'
 import { loadReferenceInfo } from '../features/results/selectors'
 import { SpineFigure } from '../features/spine3d/SpineFigure'
+import { CountUp, EASE, Magnet, Marquee, RevealWords, Stagger, StaggerItem } from '../components/fx'
 import { ButtonLink, Caption, Label, Panel, Rule } from '../components/ui'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { Reveal } from '../motion/Reveal'
@@ -20,6 +21,8 @@ const STEPS = [
   { n: '02', title: 'Compare level by level', body: 'Each vertebra, disc and regional angle is compared only with the same level in a synthetic reference, using the matching sex group when you give it. You get the difference, the percentage, a z-score and a percentile.' },
   { n: '03', title: 'Read what stands out', body: 'Levels that sit far from the reference are marked on the spine and in a table. A second, separate model score looks at the whole pattern and says plainly when it cannot answer.' },
 ]
+
+const MARQUEE = ['C3 vertebral body height anterior', 'L4-L5 disc height', 'T7 segmental sagittal angle', 'Lumbar regional angle L1-S1', 'z-score and percentile for every level', 'Matching reference by sex', 'Model score with abstention', 'No value is ever filled in', 'Synthetic data, not a diagnosis']
 
 const TABLE = [
   { block: 'Vertebral bodies', count: '22 levels × 6', detail: 'C3 to L5: four edge heights, width, depth' },
@@ -57,7 +60,7 @@ export default function Landing() {
           <section className="pb-16 pt-14 lg:min-h-[78vh] lg:pt-20" aria-labelledby="hero-title">
             <Label>Atlas plate 01 · Spinal measurement analysis</Label>
             <h1 id="hero-title" className="mt-6 text-[clamp(2.6rem,6.2vw,5rem)]">
-              Read the spine <em className="text-accent">level by level</em>.
+              <RevealWords parts={[{ text: 'Read the spine' }, { text: 'level by level', accent: true }, { text: '.' }]} delay={0.1} />
             </h1>
             <p className="mt-6 max-w-[34rem] text-lg text-muted">
               Spinalytics compares each measured vertebra, disc and angle with a reference and shows where a pattern departs from it, with the numbers and the reasoning on the page. It runs on synthetic data and explains what it cannot say.
@@ -66,13 +69,31 @@ export default function Landing() {
               <Label>Start here</Label>
               <p className="mt-2">Open a synthetic sample case and see a full result in under a minute, or bring your own measurements.</p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <ButtonLink to="/analyze">Start an analysis</ButtonLink>
-                <ButtonLink to="/about" variant="secondary">
-                  How it works
-                </ButtonLink>
+                <Magnet>
+                  <ButtonLink to="/analyze">Start an analysis</ButtonLink>
+                </Magnet>
+                <Magnet>
+                  <ButtonLink to="/about" variant="secondary">
+                    How it works
+                  </ButtonLink>
+                </Magnet>
               </div>
             </Panel>
           </section>
+
+          <Stagger className="mb-6 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-rule bg-rule sm:grid-cols-4" aria-label="At a glance">
+            {[
+              { n: 204, label: 'Measurements' },
+              { n: 22, label: 'Vertebrae' },
+              { n: 23, label: 'Discs' },
+              { n: 3, label: 'Regional angles' },
+            ].map((s) => (
+              <StaggerItem key={s.label} className="bg-bg p-4">
+                <CountUp value={s.n} className="font-display text-4xl" />
+                <p className="mt-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-muted">{s.label}</p>
+              </StaggerItem>
+            ))}
+          </Stagger>
 
           <figure className="mb-16 lg:hidden" aria-label="Schematic spine">
             <SpineSchematic className="mx-auto h-[26rem] w-auto max-w-full" />
@@ -90,13 +111,13 @@ export default function Landing() {
               {STEPS.map((s, i) => (
                 <li key={s.n}>
                   <Reveal delay={i * 0.05}>
-                    <div className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-rule pt-5">
-                      <span className="font-mono text-2xl text-accent">{s.n}</span>
+                    <motion.div whileHover={{ x: 6 }} transition={{ duration: 0.3, ease: EASE }} className="group grid grid-cols-[3.5rem_1fr] gap-4 border-t border-rule pt-5 transition-colors hover:border-accent">
+                      <span className="font-mono text-2xl text-accent transition-transform duration-300 group-hover:scale-110">{s.n}</span>
                       <div>
                         <h3 className="text-2xl">{s.title}</h3>
                         <p className="mt-2 max-w-[34rem] text-muted">{s.body}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   </Reveal>
                 </li>
               ))}
@@ -130,7 +151,7 @@ export default function Landing() {
                         <th scope="row" className="py-3 pr-4 font-normal">
                           {r.block}
                         </th>
-                        <td className="py-3 pr-4 font-mono tabular-nums text-muted">{r.count}</td>
+                        <td className="whitespace-nowrap py-3 pr-4 font-mono tabular-nums text-muted">{r.count}</td>
                         <td className="py-3 text-muted">{r.detail}</td>
                       </tr>
                     ))}
@@ -164,6 +185,10 @@ export default function Landing() {
             <Caption label="FIG. 1">{CAPTIONS[caption]}</Caption>
           </figure>
         </aside>
+      </div>
+
+      <div className="mt-8">
+        <Marquee items={MARQUEE} />
       </div>
     </div>
   )

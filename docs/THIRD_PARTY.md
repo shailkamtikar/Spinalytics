@@ -1,6 +1,6 @@
 # Third-party software and fonts
 
-Nothing here was copied as source into the repository: every item is installed as a package. No component source was taken from a component gallery, and no image or 3D asset is used (the 3D spine is generated in code).
+Nothing here was copied as source into the repository: every item is installed as a package. No component source was taken from a component gallery, and no image or 3D asset is used (the 3D spine is generated in code). The interaction patterns in `frontend/src/components/fx/` (word reveal, count-up, magnetic button, cursor spotlight, ticker, stagger, scroll progress) are original implementations on top of Motion, inspired by patterns popularised by Motion, 21st.dev and React Bits; none of their source was copied.
 
 ## Fonts (self-hosted through `@fontsource` packages)
 

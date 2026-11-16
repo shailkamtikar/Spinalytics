@@ -52,7 +52,7 @@ export function DeviationChart({ findings, selectedLevel, onSelectLevel, within,
               <ReferenceLine key={y} y={y} stroke={Math.abs(y) === within ? 'var(--muted)' : 'var(--large)'} strokeDasharray="4 4" />
             ))}
             <ReferenceLine y={0} stroke="var(--rule)" />
-            <Bar dataKey="z" isAnimationActive={false} onClick={(d) => onSelectLevel((d as unknown as { level: string }).level)}>
+            <Bar dataKey="z" isAnimationActive animationDuration={800} animationEasing="ease-out" onClick={(d) => onSelectLevel((d as unknown as { level: string }).level)}>
               {data.map((d) => (
                 <Cell key={d.level} fill={FILL[d.status]} fillOpacity={selectedLevel && selectedLevel !== d.level ? 0.45 : 1} stroke={selectedLevel === d.level ? 'var(--text)' : 'none'} cursor="pointer" />
               ))}

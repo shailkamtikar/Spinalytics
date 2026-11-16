@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { getSampleCase, getSampleCases, type SampleCase, type SampleCaseSummary } from '../../api/client'
 import type { ApiError } from '../../api/errors'
@@ -57,7 +58,7 @@ export function SampleCasePicker({ onPick }: Props) {
         </thead>
         <tbody>
           {cases.map((c, i) => (
-            <tr key={c.case_id} className={`border-b border-rule align-top ${selected === c.case_id ? 'bg-surface' : ''}`}>
+            <motion.tr key={c.case_id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className={`border-b border-rule align-top transition-colors hover:bg-surface ${selected === c.case_id ? 'bg-surface' : ''}`}>
               <td className="py-3 font-mono text-accent">{String(i + 1).padStart(2, '0')}</td>
               <th scope="row" className="py-3 pr-4 font-normal">
                 <span className="block">{c.title}</span>
@@ -76,7 +77,7 @@ export function SampleCasePicker({ onPick }: Props) {
                   {loadingId === c.case_id ? 'Loading…' : selected === c.case_id ? 'Selected' : 'Use'}
                 </button>
               </td>
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>
