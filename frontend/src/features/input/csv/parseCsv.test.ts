@@ -117,9 +117,8 @@ test('T-6.2-15 the template round trip gives the same result as the sample case'
   same(built.request.measurements, case1.request.measurements)
   expect(built.request.person).toEqual(case1.request.person)
   // Git may check the file out with Windows line endings; the content is what matters
-  expect(readFileSync(join(__dirname, '..', '..', '..', '..', 'public', 'spinalytics_template.csv'), 'utf-8').replace(/
-/g, '
-')).toBe(text)
+  const file = readFileSync(join(__dirname, '..', '..', '..', '..', 'public', 'spinalytics_template.csv'), 'utf-8')
+  expect(file.split('\r\n').join('\n')).toBe(text)
 })
 
 test('the same case sent as CSV and posted directly carry identical values (case 2)', () => {
