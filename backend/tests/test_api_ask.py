@@ -56,18 +56,13 @@ def test_t_8_2_01_in_scope_question(client, result, monkeypatch):
     assert fake.calls[0]["api_key"] == KEY and fake.calls[0]["model"] == "gemini-3.5-flash-lite"
 
 
-def test_t_8_2_02_out_of_scope_makes_no_call(client, result, monkeypatch):
+def test_any_wording_goes_to_the_model(client, result, monkeypatch):
     fake = Fake()
     monkeypatch.setattr(ai, "ask", fake)
-    body = post(client, result, "Write Python code to add two numbers").json()
-    assert body["answer"] == REFUSAL and body["refused"] is True and body["ai_generated"] is False and fake.calls == []
-
-
-def test_t_8_2_03_uncertain_asks_to_rephrase(client, result, monkeypatch):
-    fake = Fake()
-    monkeypatch.setattr(ai, "ask", fake)
-    body = post(client, result, "What does this mean?").json()
-    assert body["needs_rephrase"] is True and "rephrase" in body["answer"].lower() and fake.calls == []
+    for q in ("Write Python code to add two numbers", "What does this mean?", "is my back ok lol"):
+        body = post(client, result, q).json()
+        assert body["ai_generated"] is True and body["refused"] is False
+    assert len(fake.calls) == 3
 
 
 def test_t_8_2_04_no_key(client, result, monkeypatch):

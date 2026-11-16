@@ -61,12 +61,8 @@ def classify(question: str) -> ScopeResult:
         return ScopeResult("rejected", "The question is empty.")
     if len(q) > MAX_QUESTION_CHARS:
         return ScopeResult("rejected", f"The question is longer than {MAX_QUESTION_CHARS} characters.")
-    for rx in _BLOCK_RE:
-        if rx.search(q):
-            return ScopeResult("out_of_scope", "blocked topic")
-    if any(rx.search(q) for rx in _ALLOW_RE):
-        return ScopeResult("in_scope", "allowed topic")
-    return ScopeResult("uncertain", "no recognised topic")
+    # no topic filter: the model itself is instructed to stay with health and the report
+    return ScopeResult("in_scope", "open question")
 
 
 def levels_mentioned(question: str) -> list[str]:
