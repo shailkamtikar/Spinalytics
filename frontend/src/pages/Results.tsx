@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import type { Finding } from '../api/client'
-import { Caption, Label, Rule } from '../components/ui'
+import { getHealth, type Finding } from '../api/client'
+import { AskPanel } from '../features/assistant/AskPanel'
+import { Button, Caption, Label, Rule } from '../components/ui'
 import { DeviationChart, ReferenceChart } from '../features/results/Charts'
 import { FindingsTable } from '../features/results/FindingsTable'
 import { LevelList } from '../features/results/LevelList'
@@ -20,6 +21,17 @@ export default function Results() {
   const { reference, model } = useInfo()
   const heading = useRef<HTMLHeadingElement>(null)
   const [focusColumn, setFocusColumn] = useState<string | null>(null)
+  const [askOpen, setAskOpen] = useState(false)
+  const [aiConfigured, setAiConfigured] = useState<boolean | null>(null)
+  const askButton = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    let alive = true
+    getHealth().then((h) => alive && setAiConfigured(h.ai_assistant_configured), () => alive && setAiConfigured(false))
+    return () => {
+      alive = false
+    }
+  }, [])
 
   useEffect(() => heading.current?.focus(), [result])
   useEffect(() => {
@@ -60,6 +72,23 @@ export default function Results() {
         </figure>
         <div className="space-y-6">
           <ModelPanel model={result.model} onSelectLevel={selectLevel} />
+          <div>
+            {aiConfigured === false && <p className="text-sm text-muted">The optional AI assistant is not set up on this server. Everything else on this page works without it.</p>}
+            {aiConfigured && !askOpen && (
+              <Button ref={askButton} variant="secondary" onClick={() => setAskOpen(true)}>
+                Ask AI About This Result
+              </Button>
+            )}
+            {aiConfigured && askOpen && (
+              <AskPanel
+                result={result}
+                onClose={() => {
+                  setAskOpen(false)
+                  requestAnimationFrame(() => askButton.current?.focus())
+                }}
+              />
+            )}
+          </div>
           <DetailsPanel level={selected} findings={findings} onClear={() => selectLevel(null)} />
           <div>
             <Rule number="A" title="Deviation by level" />

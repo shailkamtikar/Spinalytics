@@ -1969,12 +1969,12 @@ git push origin m8.3
 
 | Item | Record |
 |---|---|
-| Completed milestones | 8.1 ☐ 8.2 ☐ 8.3 ☐ |
-| Tests passed | __ / 42 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | Remove the key → analysis, table, 3D and report unaffected; restore the key → one live question answered ☐ |
-| Go / No-Go | Go only if T-8.2-02, T-8.2-09 and T-8.2-12 pass |
+| Completed milestones | 8.1 ☑ 8.2 ☑ 8.3 ☑ |
+| Tests passed | 51 new backend tests (245 / 245) and 11 new frontend tests (99 / 99); all automated cases of the 42 covered, the Gemini client is mocked in every automated test |
+| Known issues | The default model in the playbook flow was unknown (item C-2). The live check showed `gemini-2.5-flash` is no longer available to new keys (404), so the backend default is now `gemini-3.1-flash-lite`, overridable with `GEMINI_MODEL`. The approved source list is still empty (item C-3), so answers state that no reliable source is available. The rule-based gate is imperfect by design (documented in `docs/AI_ASSISTANT.md`) |
+| Git commit / hash | recorded in the merge commit `phase-8-done` |
+| Overall phase verification | T-8.2-14 done once: through the running backend with the real key, "Why is C3 flagged?" returned an explanation that quoted the supplied numbers, framed possibilities as possibilities and cited no source; "Write Python code to add two numbers" returned the fixed refusal with no model call. In the browser the same question was asked from the panel. With the key empty, `/api/analyze` returns 200 (T-8.2-12) ☑ |
+| Go / No-Go | Go: T-8.2-02, T-8.2-09 and T-8.2-12 pass |
 
 ```powershell
 git checkout main

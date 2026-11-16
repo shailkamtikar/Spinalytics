@@ -114,4 +114,19 @@ export const getSampleCase = (id: string) => request<SampleCase>(`/api/sample-ca
 export const getCatalog = () => request<Catalog>('/api/feature-catalog')
 export const getReferenceInfo = () => request<ReferenceInfo>('/api/reference-info')
 export const getModelInfo = () => request<ModelInfo>('/api/model-info')
+export interface AskTurn {
+  role: 'user' | 'assistant'
+  text: string
+}
+export interface AskAnswer {
+  answer: string
+  ai_generated: boolean
+  refused: boolean
+  needs_rephrase: boolean
+  sources: Record<string, unknown>[]
+  label: string
+}
+export const askResult = (question: string, history: AskTurn[], result: AnalyzeResponse) =>
+  request<AskAnswer>('/api/ask-result', { method: 'POST', body: JSON.stringify({ question, history: history.slice(-6), result }) }, 30_000)
+
 export const analyze = (body: AnalyzeRequest) => request<AnalyzeResponse>('/api/analyze', { method: 'POST', body: JSON.stringify(body) })

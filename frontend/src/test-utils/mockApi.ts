@@ -3,7 +3,10 @@ import { catalog, sampleCases } from './fixtures'
 
 export interface MockOptions {
   analyze?: (body: unknown) => unknown
-  health?: boolean
+  /** Whether /api/health reports the assistant as configured. */
+  ai?: boolean
+  /** Answer for /api/ask-result: status and JSON body. */
+  ask?: (body: unknown) => { status: number; body: unknown }
 }
 
 const json = (status: number, body: unknown) => ({ ok: status < 300, status, json: async () => body })
@@ -14,13 +17,17 @@ export function mockApi(opts: MockOptions = {}) {
   const impl = vi.fn(async (url: string, init?: RequestInit) => {
     const body = init?.body ? JSON.parse(String(init.body)) : undefined
     calls.push({ url, body })
-    if (url === '/api/health') return json(200, { status: 'ok', version: '0.1.0', ai_assistant_configured: false })
+    if (url === '/api/health') return json(200, { status: 'ok', version: '0.1.0', ai_assistant_configured: opts.ai ?? false })
     if (url === '/api/feature-catalog') return json(200, catalog)
     if (url === '/api/sample-cases') return json(200, sampleCases.map(({ request: _r, incomplete_note: _n, ...s }) => s))
     const m = /^\/api\/sample-cases\/(.+)$/.exec(url)
     if (m) {
       const c = sampleCases.find((s) => s.case_id === decodeURIComponent(m[1]))
       return c ? json(200, c) : json(404, { error: { code: 'not_found', message: 'Sample case not found.', fields: [] } })
+    }
+    if (url === '/api/ask-result') {
+      const r = opts.ask ? opts.ask(body) : { status: 200, body: { answer: 'C3 is below the reference. One possibility is lower bone density.', ai_generated: true, refused: false, needs_rephrase: false, sources: [], label: 'AI-generated educational explanation. Not a diagnosis.' } }
+      return json(r.status, r.body)
     }
     if (url === '/api/analyze') return json(200, opts.analyze ? opts.analyze(body) : fakeResult('within_reference'))
     return json(404, { error: { code: 'not_found', message: url, fields: [] } })
