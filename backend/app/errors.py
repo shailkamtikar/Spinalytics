@@ -14,6 +14,14 @@ from app.analysis.validation import InputValidationError
 log = logging.getLogger("spinalytics.errors")
 
 
+class ApiException(Exception):
+    """A controlled failure with its own status and code, answered with the standard envelope."""
+
+    def __init__(self, status: int, code: str, message: str):
+        self.status, self.code, self.message = status, code, message
+        super().__init__(message)
+
+
 def envelope(status: int, code: str, message: str, fields: list[dict] | None = None, headers: dict | None = None) -> JSONResponse:
     return JSONResponse({"error": {"code": code, "message": message, "fields": fields or []}}, status_code=status, headers=headers)
 
@@ -37,6 +45,10 @@ def install(app: FastAPI) -> None:
     async def _http(_: Request, exc: StarletteHTTPException):
         code = {404: "not_found", 405: "method_not_allowed", 413: "payload_too_large"}.get(exc.status_code, "http_error")
         return envelope(exc.status_code, code, str(exc.detail), headers=getattr(exc, "headers", None))
+
+    @app.exception_handler(ApiException)
+    async def _api(_: Request, exc: ApiException):
+        return envelope(exc.status, exc.code, exc.message)
 
     @app.exception_handler(RateLimitExceeded)
     async def _rate(_: Request, exc: RateLimitExceeded):
