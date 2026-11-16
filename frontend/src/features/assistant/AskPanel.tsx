@@ -93,7 +93,7 @@ export function AskPanel({ result, onClose }: Props) {
           <div key={i} className={m.role === 'user' ? 'text-right' : ''}>
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted">{m.role === 'user' ? 'You' : m.aiGenerated ? 'AI-generated educational explanation' : 'Spinalytics'}</p>
             <p className={`mt-1 whitespace-pre-line text-sm ${m.kind === 'error' ? 'text-review' : ''}`}>{m.text}</p>
-            {m.aiGenerated && <p className="mt-1 text-xs text-muted">Not a diagnosis. Sources: none supplied, so none are cited.</p>}
+            {m.aiGenerated && <p className="mt-1 text-xs text-muted">AI can make mistakes; this is an estimate, not a diagnosis. Sources: none supplied, so none are cited.</p>}
           </div>
         ))}
         {busy && <p role="status" className="font-mono text-sm text-muted">Thinking…</p>}
