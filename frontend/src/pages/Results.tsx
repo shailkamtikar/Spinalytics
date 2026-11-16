@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { getHealth, type Finding } from '../api/client'
 import { AskPanel } from '../features/assistant/AskPanel'
-import { Button, Caption, Label, Rule } from '../components/ui'
+import { Button, ButtonLink, Caption, Label, Rule } from '../components/ui'
 import { DeviationChart, ReferenceChart } from '../features/results/Charts'
 import { FindingsTable } from '../features/results/FindingsTable'
 import { LevelList } from '../features/results/LevelList'
@@ -59,6 +59,11 @@ export default function Results() {
         {overall.title}
       </h1>
       <Summary result={result} />
+      <div className="mt-4">
+        <ButtonLink to="/report" variant="secondary">
+          Export report
+        </ButtonLink>
+      </div>
 
       <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         <figure className="lg:sticky lg:top-20 lg:self-start">

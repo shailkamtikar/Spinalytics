@@ -2,13 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { askResult, type AnalyzeResponse, type AskTurn } from '../../api/client'
 import { ApiError, friendlyMessage } from '../../api/errors'
 import { Button, Label, Panel } from '../../components/ui'
-
-interface Message {
-  role: 'user' | 'assistant'
-  text: string
-  aiGenerated?: boolean
-  kind?: 'answer' | 'refusal' | 'rephrase' | 'error'
-}
+import { useAnalysisStore, type AssistantMessage } from '../../state/analysisStore'
 
 const MAX = 500
 
@@ -30,7 +24,8 @@ interface Props {
 
 /** Plain-text conversation, kept in memory only. Answers are rendered as text, never as HTML. */
 export function AskPanel({ result, onClose }: Props) {
-  const [messages, setMessages] = useState<Message[]>([])
+  const messages = useAnalysisStore((st) => st.messages)
+  const addMessage = useAnalysisStore((st) => st.addMessage)
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [blockedUntil, setBlockedUntil] = useState(0)
@@ -39,7 +34,7 @@ export function AskPanel({ result, onClose }: Props) {
 
   useEffect(() => input.current?.focus(), [])
 
-  const history = (): AskTurn[] => messages.filter((m) => m.kind === 'answer' || m.role === 'user').map((m) => ({ role: m.role, text: m.text }))
+  const history = (): AskTurn[] => messages.filter((m: AssistantMessage) => m.kind === 'answer' || m.role === 'user').map((m) => ({ role: m.role, text: m.text }))
 
   const send = async (question: string) => {
     const q = question.trim()
@@ -47,15 +42,15 @@ export function AskPanel({ result, onClose }: Props) {
     if (Date.now() < blockedUntil) return
     submitting.current = true
     setBusy(true)
-    setMessages((m) => [...m, { role: 'user', text: q }])
+    addMessage({ role: 'user', text: q })
     setText('')
     try {
       const r = await askResult(q, history(), result)
-      setMessages((m) => [...m, { role: 'assistant', text: r.answer, aiGenerated: r.ai_generated, kind: r.refused ? 'refusal' : r.needs_rephrase ? 'rephrase' : 'answer' }])
+      addMessage({ role: 'assistant', text: r.answer, aiGenerated: r.ai_generated, kind: r.refused ? 'refusal' : r.needs_rephrase ? 'rephrase' : 'answer' })
     } catch (e) {
       const err = e instanceof ApiError ? e : new ApiError('server', 'Unexpected error.')
       if (err.kind === 'rate_limited') setBlockedUntil(Date.now() + 60_000) // no automatic resend
-      setMessages((m) => [...m, { role: 'assistant', text: err.kind === 'rate_limited' ? 'You have asked several questions in a short time. Please wait a minute before asking another.' : friendlyMessage(err), kind: 'error' }])
+      addMessage({ role: 'assistant', text: err.kind === 'rate_limited' ? 'You have asked several questions in a short time. Please wait a minute before asking another.' : friendlyMessage(err), kind: 'error' })
     } finally {
       setBusy(false)
       submitting.current = false
