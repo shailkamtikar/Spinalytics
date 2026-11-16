@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
 import { Link, type LinkProps } from 'react-router-dom'
 
 export type Status = 'within' | 'review' | 'large_deviation' | 'missing' | 'no_reference'
@@ -81,8 +81,12 @@ export function NumberCell({ value, unit, digits = 2, signed = false }: { value:
   )
 }
 
-export function Panel({ children, className = '', as: Tag = 'section' }: { children: ReactNode; className?: string; as?: 'section' | 'div' | 'aside' }) {
-  return <Tag className={`rounded-sm border border-rule bg-surface p-5 ${className}`}>{children}</Tag>
+export function Panel({ children, className = '', as: Tag = 'section', ...rest }: HTMLAttributes<HTMLElement> & { as?: 'section' | 'div' | 'aside' }) {
+  return (
+    <Tag className={`rounded-sm border border-rule bg-surface p-5 ${className}`} {...rest}>
+      {children}
+    </Tag>
+  )
 }
 
 export function SyntheticBadge() {
