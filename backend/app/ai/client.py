@@ -8,7 +8,7 @@ import logging
 
 log = logging.getLogger("spinalytics.ai")
 
-ASK_TIMEOUT_SECONDS = 45.0
+ASK_TIMEOUT_SECONDS = 60.0
 MAX_OUTPUT_TOKENS = 600
 
 
@@ -50,7 +50,7 @@ def ask(system: str, context_json: str, history: list[dict], question: str, *, a
 
     client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=int(min(timeout, 20) * 1000)))
     text = ""
-    for attempt in range(4):  # Google answers 503 "high demand" in short spikes; a quick retry usually succeeds
+    for attempt in range(7):  # Google answers 503 "high demand" in short spikes; a quick retry usually succeeds
         try:
             response = client.models.generate_content(
                 model=model,
@@ -62,7 +62,7 @@ def ask(system: str, context_json: str, history: list[dict], question: str, *, a
         except errors.APIError as exc:
             code = getattr(exc, "code", None)
             log.warning("gemini API error code=%s attempt=%s", code, attempt + 1)  # never the key, question or context
-            if code in (500, 502, 503, 504) and attempt < 3:
+            if code in (500, 502, 503, 504) and attempt < 6:
                 time.sleep(1.0 + attempt)
                 continue
             if code == 429:

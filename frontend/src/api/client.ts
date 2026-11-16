@@ -127,6 +127,6 @@ export interface AskAnswer {
   label: string
 }
 export const askResult = (question: string, history: AskTurn[], result: AnalyzeResponse) =>
-  request<AskAnswer>('/api/ask-result', { method: 'POST', body: JSON.stringify({ question, history: history.slice(-6), result }) }, 55_000)
+  request<AskAnswer>('/api/ask-result', { method: 'POST', body: JSON.stringify({ question, history: history.slice(-6), result }) }, 75_000)
 
 export const analyze = (body: AnalyzeRequest) => request<AnalyzeResponse>('/api/analyze', { method: 'POST', body: JSON.stringify(body) })
