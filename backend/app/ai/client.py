@@ -8,7 +8,7 @@ import logging
 
 log = logging.getLogger("spinalytics.ai")
 
-ASK_TIMEOUT_SECONDS = 20.0
+ASK_TIMEOUT_SECONDS = 45.0
 MAX_OUTPUT_TOKENS = 600
 
 
@@ -46,28 +46,36 @@ def ask(system: str, context_json: str, history: list[dict], question: str, *, a
         from google.genai import errors, types
     except Exception as exc:  # library missing
         raise AiError("the Gemini library is not installed") from exc
-    try:
-        client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=int(timeout * 1000)))
-        response = client.models.generate_content(
-            model=model,
-            contents=_contents(context_json, history, question),
-            config=types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=MAX_OUTPUT_TOKENS),
-        )
-        text = (response.text or "").strip()
-    except errors.APIError as exc:
-        code = getattr(exc, "code", None)
-        log.warning("gemini API error code=%s", code)  # never the key, question or context
-        if code == 429:
-            raise AiQuota("quota or rate limit") from exc
-        if code in (408, 504):
-            raise AiTimeout("timeout") from exc
-        raise AiError(f"api error {code}") from exc
-    except Exception as exc:
-        name = type(exc).__name__
-        log.warning("gemini call failed: %s", name)
-        if "timeout" in name.lower() or "timed out" in str(exc).lower():
-            raise AiTimeout("timeout") from exc
-        raise AiError(name) from exc
+    import time
+
+    client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=int(min(timeout, 20) * 1000)))
+    text = ""
+    for attempt in range(4):  # Google answers 503 "high demand" in short spikes; a quick retry usually succeeds
+        try:
+            response = client.models.generate_content(
+                model=model,
+                contents=_contents(context_json, history, question),
+                config=types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=MAX_OUTPUT_TOKENS, thinking_config=types.ThinkingConfig(thinking_level="LOW")),
+            )
+            text = (response.text or "").strip()
+            break
+        except errors.APIError as exc:
+            code = getattr(exc, "code", None)
+            log.warning("gemini API error code=%s attempt=%s", code, attempt + 1)  # never the key, question or context
+            if code in (500, 502, 503, 504) and attempt < 3:
+                time.sleep(1.0 + attempt)
+                continue
+            if code == 429:
+                raise AiQuota("quota or rate limit") from exc
+            if code in (408, 504):
+                raise AiTimeout("timeout") from exc
+            raise AiError(f"api error {code}") from exc
+        except Exception as exc:
+            name = type(exc).__name__
+            log.warning("gemini call failed: %s", name)
+            if "timeout" in name.lower() or "timed out" in str(exc).lower():
+                raise AiTimeout("timeout") from exc
+            raise AiError(name) from exc
     if not text:
         raise AiError("empty answer")
     return text
