@@ -25,7 +25,7 @@ test('status colouring is carried on the matching element only', () => {
   expect(container.querySelector('[data-level="L4"]')).not.toHaveAttribute('data-status')
 })
 
-test('measured levels are selectable by click and keyboard; unmeasured ones are not', async () => {
+test('every level is selectable by click and keyboard; unmeasured ones are described as such by the details panel', async () => {
   const onSelect = vi.fn()
   const { container } = render(<SpineSchematic onSelect={onSelect} statuses={{ T7: 'within' }} />)
   await userEvent.click(container.querySelector('[data-level="T7"]')!)
@@ -34,7 +34,7 @@ test('measured levels are selectable by click and keyboard; unmeasured ones are 
   await userEvent.keyboard('{Enter}')
   expect(onSelect).toHaveBeenLastCalledWith('L1')
   await userEvent.click(container.querySelector('[data-level="C1"]')!)
-  expect(onSelect).toHaveBeenCalledTimes(2)
+  expect(onSelect).toHaveBeenLastCalledWith('C1')
 })
 
 test('the group has a text alternative that says the sizes are illustrative', () => {

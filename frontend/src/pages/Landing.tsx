@@ -1,6 +1,9 @@
 import { useMotionValue, useMotionValueEvent, useScroll, useTransform } from 'motion/react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { ReferenceInfo } from '../api/client'
 import { SpineSchematic } from '../components/spine/SpineSchematic'
+import { loadReferenceInfo } from '../features/results/selectors'
+import { SpineFigure } from '../features/spine3d/SpineFigure'
 import { ButtonLink, Caption, Label, Panel, Rule } from '../components/ui'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { Reveal } from '../motion/Reveal'
@@ -35,6 +38,16 @@ export default function Landing() {
   const [caption, setCaption] = useState(0)
   useMotionValueEvent(scrollYProgress, 'change', (v) => setCaption(v < 0.18 ? 0 : v < 0.7 ? 1 : 2))
   const spreadValue = reduced ? still : spreadAnimated
+  const [reference, setReference] = useState<ReferenceInfo | null>(null)
+
+  // The 3D scene is requested only when the browser is idle, so text and the action are usable first.
+  useEffect(() => {
+    if (reduced) return
+    const load = () => loadReferenceInfo().then(setReference, () => {})
+    const idle = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+    const id = idle ? idle(load, { timeout: 2500 }) : window.setTimeout(load, 1200)
+    return () => (idle ? (window as unknown as { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(id) : clearTimeout(id))
+  }, [reduced])
 
   return (
     <div ref={container} className="mx-auto max-w-[1280px] px-6 lg:px-10">
@@ -143,7 +156,7 @@ export default function Landing() {
         <aside className="hidden lg:block" aria-label="Figure">
           <figure className="sticky top-24 flex h-[calc(100vh-7rem)] flex-col">
             <div className="relative min-h-0 flex-1">
-              <SpineSchematic spreadValue={spreadValue} className="absolute inset-0 h-full w-full" />
+              <SpineFigure reference={reference} spreadValue={spreadValue} interactive={false} force2d={reduced} className="absolute inset-0" />
             </div>
             <Caption label="FIG. 1">{CAPTIONS[caption]}</Caption>
           </figure>

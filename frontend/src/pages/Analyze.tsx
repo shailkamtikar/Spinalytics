@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AnalyzeRequest, SampleCase } from '../api/client'
 import { ErrorPanel } from '../components/feedback/Feedback'
@@ -43,9 +43,12 @@ export default function Analyze() {
     setTab(t)
     setPending(null)
   }
+  const submitted = useRef(false)
   const analyse = async () => {
-    if (!pending) return
+    if (!pending || submitted.current) return // a second click before the page changes must not send again
+    submitted.current = true
     if (await run(pending.request)) navigate('/results')
+    else submitted.current = false
   }
 
   return (

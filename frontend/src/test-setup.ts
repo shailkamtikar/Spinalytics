@@ -24,6 +24,7 @@ class IO {
   }
 }
 if (!('IntersectionObserver' in window)) (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = IO
+if (!('ResizeObserver' in window)) (window as unknown as { ResizeObserver: unknown }).ResizeObserver = IO
 window.scrollTo = (() => {}) as typeof window.scrollTo
 
 afterEach(() => {

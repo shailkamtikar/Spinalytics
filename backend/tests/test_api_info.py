@@ -43,6 +43,7 @@ def test_t_4_2_06_reference_info(client):
     assert "Not a clinical reference range" in body["provenance"]["limitation"]
     assert "Non-clinical" in body["thresholds"]["label"] and body["cohorts"]["all"]["n_rows"] > 0
     assert len(body["level_sizes"]["vertebrae"]) == 22 and len(body["level_sizes"]["discs"]) == 23
+    assert all({"height_mm", "sagittal_angle_deg"} <= d.keys() for d in body["level_sizes"]["discs"].values())
 
 
 def test_t_4_2_07_model_info(client):

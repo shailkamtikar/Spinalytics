@@ -63,7 +63,7 @@ export interface ReferenceInfo {
   cohorts: Record<string, { description: string; n_rows: number }>
   thresholds: { within_max_abs_z: number; large_min_abs_z: number; min_completeness: number; label: string }
   overall_rule: Record<string, unknown>
-  level_sizes: { vertebrae: Record<string, { height_mm: number; width_mm: number; depth_mm: number }>; discs: Record<string, { height_mm: number }> }
+  level_sizes: { vertebrae: Record<string, { height_mm: number; width_mm: number; depth_mm: number }>; discs: Record<string, { height_mm: number; sagittal_angle_deg: number }> }
   disclaimer: string
 }
 

@@ -89,6 +89,8 @@ class ReferenceSummary(BaseModel):
     n: int
     mean: float
     median: float
+    q1: float
+    q3: float
     sd: float
     interval_low: float  # 2.5th percentile
     interval_high: float  # 97.5th percentile

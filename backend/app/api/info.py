@@ -42,7 +42,13 @@ def reference_info(response: Response) -> dict:
             "width_mm": round(mean("vertebral_body_width_mm"), 2),
             "depth_mm": round(mean("vertebral_body_depth_mm"), 2),
         }
-    discs = {d: {"height_mm": round(ref.stats("all", f"{d.replace('-', '_')}_disc_height_mm")["mean"], 2)} for d in anatomy.DISCS}
+    discs = {
+        d: {
+            "height_mm": round(ref.stats("all", f"{d.replace('-', '_')}_disc_height_mm")["mean"], 2),
+            "sagittal_angle_deg": round(ref.stats("all", f"{d.replace('-', '_')}_segmental_sagittal_angle_deg")["mean"], 2),
+        }
+        for d in anatomy.DISCS
+    }
     rule = ref.overall_rule
     rule_keys = ("chance_outlier_limit", "large_count_limit", "extreme_abs_z", "calibrated_on", "validation_false_flag_rate", "validation_detection_rate", "limitation")
     return {
