@@ -1,4 +1,6 @@
+import { motion } from 'motion/react'
 import type { AnalyzeRequest, Catalog } from '../../api/client'
+import { EASE } from '../../components/fx'
 import { useAnalysisStore } from '../../state/analysisStore'
 import { ServerWaking } from '../../components/feedback/Feedback'
 import { Button, Caption, Label, Panel } from '../../components/ui'
@@ -20,11 +22,15 @@ export function ReviewPanel({ request, catalog, notes = [], blockers = [], onAna
   const warnings = reviewWarnings(s)
   const busy = status === 'loading' || status === 'waking'
   return (
+    <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: EASE }}>
     <Panel aria-labelledby="review-title" className="mt-8">
       <Label>Review before analysing</Label>
       <h2 id="review-title" className="mt-2 text-2xl">
         Check what will be sent
       </h2>
+      <div className="mt-4 h-1.5 w-full max-w-lg overflow-hidden rounded-full bg-rule" role="presentation">
+        <motion.div className="h-full rounded-full bg-accent" initial={{ width: 0 }} animate={{ width: `${Math.round(s.completeness * 100)}%` }} transition={{ duration: 0.9, ease: EASE }} />
+      </div>
       <figure className="mt-4">
         <table className="w-full max-w-lg border-collapse text-left text-sm">
           <thead>
@@ -73,5 +79,6 @@ export function ReviewPanel({ request, catalog, notes = [], blockers = [], onAna
         </Button>
       </div>
     </Panel>
+    </motion.div>
   )
 }

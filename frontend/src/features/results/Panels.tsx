@@ -1,4 +1,6 @@
+import { motion } from 'motion/react'
 import type { Finding, ModelInfo, ModelResult, ReferenceInfo } from '../../api/client'
+import { CountUp, EASE } from '../../components/fx'
 import { Label, NumberCell, Panel, StatusBadge, type Status } from '../../components/ui'
 import { MODEL_LABEL, OVERALL_LABEL } from '../../domain/wording'
 import { UNMEASURED } from '../../domain/levels'
@@ -26,9 +28,9 @@ export function Summary({ result }: { result: Result }) {
           <dt className="text-muted">Completeness</dt>
           <dd className="text-right tabular-nums">{Math.round(s.completeness * 100)}% ({s.n_present} of {s.n_expected})</dd>
           <dt className="text-muted">Larger deviation</dt>
-          <dd className="text-right tabular-nums">{s.n_large}</dd>
+          <dd className="text-right"><CountUp value={s.n_large} /></dd>
           <dt className="text-muted">Review</dt>
-          <dd className="text-right tabular-nums">{s.n_review}</dd>
+          <dd className="text-right"><CountUp value={s.n_review} /></dd>
           <dt className="text-muted">Outside central range</dt>
           <dd className="text-right tabular-nums">{s.outlier_count}{limit ? ` (up to ${limit} expected by chance)` : ''}</dd>
           <dt className="text-muted">Reference group</dt>
@@ -61,7 +63,7 @@ export function ModelPanel({ model, onSelectLevel }: { model: ModelResult; onSel
           </p>
           <div className="relative mt-3 h-3 border border-rule" role="img" aria-label={`Model score ${model.score.toFixed(2)} on a scale from 0 to 1; the uncertain band is ${model.band_low} to ${model.band_high}`}>
             <div className="absolute inset-y-0 bg-review/30" style={{ left: `${(model.band_low ?? 0.4) * 100}%`, width: `${((model.band_high ?? 0.6) - (model.band_low ?? 0.4)) * 100}%` }} />
-            <div className="absolute -inset-y-1 w-0.5 bg-text" style={{ left: `${model.score * 100}%` }} />
+            <motion.div className="absolute -inset-y-1 w-0.5 bg-text" initial={{ left: '0%' }} animate={{ left: `${model.score * 100}%` }} transition={{ duration: 1.1, ease: EASE, delay: 0.2 }} />
           </div>
           <p className="mt-2 text-xs text-muted">Not the probability of disease. It shows how much the overall pattern resembles the unusual training examples. Scores between {model.band_low} and {model.band_high} are treated as uncertain.</p>
           {(model.contributors ?? []).length > 0 && (

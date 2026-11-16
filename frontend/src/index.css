@@ -73,3 +73,112 @@ h3 {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---------- interaction polish ---------- */
+.spotlight > * {
+  position: relative;
+}
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 8%, transparent), transparent 65%);
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 70s linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+.marquee::before,
+.marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4rem;
+  z-index: 1;
+  pointer-events: none;
+}
+.marquee::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+}
+.marquee::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+}
+
+/* thin scrollbars that follow the theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+  background-clip: padding-box;
+}
+
+/* scrolling boxes fade at their edges so it is clear there is more */
+.scroll-fade-y {
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 28px), transparent 100%);
+}
+.scroll-snap-y {
+  scroll-snap-type: y proximity;
+}
+.scroll-snap-y > * {
+  scroll-snap-align: start;
+}
+
+.press {
+  transition: transform 160ms ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+.link-draw {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 280ms ease;
+}
+.link-draw:hover,
+.link-draw:focus-visible {
+  background-size: 100% 1px;
+}
+
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}

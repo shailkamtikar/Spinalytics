@@ -8,9 +8,11 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
+      aria-label={`${target} theme`}
       className="rounded-sm border border-rule px-3 py-1.5 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted transition-colors hover:border-accent hover:text-text"
     >
-      {target} theme
+      {target}
+      <span className="max-sm:hidden"> theme</span>
     </button>
   )
 }

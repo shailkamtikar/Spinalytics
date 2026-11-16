@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode, Ref } from 'react'
+import type { ButtonHTMLAttributes, HTMLAttributes, PointerEvent, ReactNode, Ref } from 'react'
 import { Link, type LinkProps } from 'react-router-dom'
 
 export type Status = 'within' | 'review' | 'large_deviation' | 'missing' | 'no_reference'
@@ -83,7 +83,15 @@ export function NumberCell({ value, unit, digits = 2, signed = false }: { value:
 
 export function Panel({ children, className = '', as: Tag = 'section', ...rest }: HTMLAttributes<HTMLElement> & { as?: 'section' | 'div' | 'aside' }) {
   return (
-    <Tag className={`rounded-sm border border-rule bg-surface p-5 ${className}`} {...rest}>
+    <Tag
+      className={`spotlight relative rounded-sm border border-rule bg-surface p-5 ${className}`}
+      onPointerMove={(e: PointerEvent<HTMLElement>) => {
+        const r = e.currentTarget.getBoundingClientRect()
+        e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`)
+        e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`)
+      }}
+      {...rest}
+    >
       {children}
     </Tag>
   )

@@ -2,7 +2,7 @@ import type { MotionValue } from 'motion/react'
 import { Component, lazy, Suspense, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { ReferenceInfo } from '../../api/client'
 import { SpineSchematic } from '../../components/spine/SpineSchematic'
-import { Button, StatusBadge, type Status } from '../../components/ui'
+import { StatusBadge, type Status } from '../../components/ui'
 import { buildSpineLayout } from './buildSpineLayout'
 import type { ViewApi } from './SpineScene'
 import { canUseWebGL } from './webgl'
@@ -70,19 +70,10 @@ export function SpineFigure({ reference, statuses, selected = null, onSelect, sp
           schematic
         )}
       </div>
-      {controls && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <Legend />
-          {use3d && (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => api.current?.reset()}>
-                Reset view
-              </Button>
-              <Button variant="secondary" onClick={() => api.current?.fit()}>
-                Fit to view
-              </Button>
-            </div>
-          )}
+      {controls && use3d && (
+        <div className="pointer-events-none absolute right-3 top-3 z-10 flex gap-2">
+          <button type="button" onClick={() => api.current?.reset()} className="press pointer-events-auto rounded-sm border border-rule bg-surface px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted hover:border-accent hover:text-text">Reset view</button>
+          <button type="button" onClick={() => api.current?.fit()} className="press pointer-events-auto rounded-sm border border-rule bg-surface px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted hover:border-accent hover:text-text">Fit to view</button>
         </div>
       )}
       {controls && !webgl && <p className="mt-2 text-sm text-muted">3D view is not available in this browser, so the 2D schematic is shown. The table has the same information.</p>}

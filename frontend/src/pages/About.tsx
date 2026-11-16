@@ -1,4 +1,6 @@
+import { RevealWords } from '../components/fx'
 import { Caption, Label, Rule } from '../components/ui'
+import { Reveal } from '../motion/Reveal'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const SECTIONS = [
@@ -42,11 +44,12 @@ export default function About() {
     <div className="mx-auto max-w-[1280px] px-6 py-16 lg:px-10">
       <Label>Method and limits</Label>
       <h1 className="mt-4 max-w-3xl text-5xl">
-        How a result is <em className="text-accent">made</em>, and where it stops.
+        <RevealWords parts={[{ text: 'How a result is' }, { text: 'made', accent: true }, { text: ', and where it stops.' }]} />
       </h1>
       <div className="mt-14 grid gap-12 lg:grid-cols-2">
         {SECTIONS.map((s) => (
-          <section key={s.n} aria-labelledby={`about-${s.n}`}>
+          <Reveal key={s.n} delay={(Number(s.n) % 2) * 0.08}>
+          <section aria-labelledby={`about-${s.n}`}>
             <Rule number={s.n} />
             <h2 id={`about-${s.n}`} className="mt-3 text-3xl">
               {s.title}
@@ -57,6 +60,7 @@ export default function About() {
               </p>
             ))}
           </section>
+          </Reveal>
         ))}
       </div>
       <figure className="mt-16 max-w-3xl">
