@@ -28,6 +28,14 @@ class Settings(BaseSettings):
 
     gemini_api_key: str = ""
     gemini_model: str = ""
+    allowed_origins: str = "http://localhost:5173"  # comma-separated; no wildcard
+    max_body_bytes: int = 256 * 1024
+    analyze_rate_limit: str = "30/minute"  # per client IP
+    ai_rate_limit: str = "5/minute"  # reserved for the optional AI route
+
+    @property
+    def origins(self) -> list[str]:
+        return [o.strip() for o in self.allowed_origins.split(",") if o.strip() and o.strip() != "*"]
 
     @property
     def ai_assistant_configured(self) -> bool:

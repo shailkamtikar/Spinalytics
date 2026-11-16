@@ -1116,12 +1116,12 @@ git push origin m4.3
 
 | Item | Record |
 |---|---|
-| Completed milestones | 4.1 ☐ 4.2 ☐ 4.3 ☐ |
-| Tests passed | __ / 32 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | With `.env` removed, every endpoint except the future AI route works ☐ |
-| Go / No-Go | Go only if T-4.1-08 passes (analysis is independent of Gemini) |
+| Completed milestones | 4.1 ☑ 4.2 ☑ 4.3 ☑ (committed together as one phase commit) |
+| Tests passed | 43 new tests, 194 / 194 in the full suite; all 32 playbook cases covered |
+| Known issues | The combined result treats a model score inside its uncertain band as `indeterminate` when statistics are within reference (the playbook rule did not cover this case). A body larger than the limit sent without a Content-Length header is answered with 413 by replacing the framework's own 400. `slowapi` added and pinned |
+| Git commit / hash | recorded in the merge commit `phase-4-done` |
+| Overall phase verification | All 8 sample cases return 200 through `POST /api/analyze` with the expected overall state (1 within reference, 2 to 7 unusual pattern, 8 indeterminate); T-4.1-08 runs with the key unset and no `google` module is imported ☑ |
+| Go / No-Go | Go: T-4.1-08 passes |
 
 ```powershell
 git checkout main

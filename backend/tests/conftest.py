@@ -25,6 +25,35 @@ def case_request(cases):
     return build
 
 
+@pytest.fixture(autouse=True)
+def _fresh_rate_limiter():
+    """The limiter keeps counters in memory; start every test from zero."""
+    from app.limiter import limiter
+
+    limiter.reset()
+    yield
+    limiter.reset()
+
+
+@pytest.fixture(scope="session")
+def client():
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    with TestClient(app) as c:  # runs the lifespan: artifacts load once
+        yield c
+
+
+@pytest.fixture
+def case_body(cases):
+    def build(number: int) -> dict:
+        c = copy.deepcopy(cases[number - 1])  # tests may edit the body; never the shared fixture
+        return {"source": "sample", "units": c["units"], "person": c["person"], "measurements": c["measurements"]}
+
+    return build
+
+
 def fake_reference(column: str, mean: float, sd: float, quantiles: list[float] | None = None) -> Reference:
     """A one-column reference with a known mean and SD (cohort 'all')."""
     q = quantiles or list(np.linspace(mean - 3 * sd, mean + 3 * sd, 201))

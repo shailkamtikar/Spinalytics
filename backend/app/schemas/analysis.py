@@ -171,3 +171,20 @@ class ModelResult(BaseModel):
     out_of_range_count: Optional[int] = None
     contributors: list[Contributor] = Field(default_factory=list)
     message: str = ""
+
+
+class OverallResult(BaseModel):
+    state: OverallState
+    reason: str
+    statistics_state: OverallState
+    model_status: str
+    model_label: Optional[str] = None
+
+
+class AnalyzeResponse(BaseModel):
+    analysis_id: str  # random, never stored
+    data_origin: Literal["synthetic"] = "synthetic"
+    disclaimer: str = DISCLAIMER
+    overall: OverallResult
+    statistical: StatisticalResult
+    model: ModelResult
