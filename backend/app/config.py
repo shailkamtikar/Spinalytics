@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     allowed_origins: str = "http://localhost:5173"  # comma-separated; no wildcard
     max_body_bytes: int = 256 * 1024
     analyze_rate_limit: str = "30/minute"  # per client IP
-    ai_rate_limit: str = "5/minute"  # reserved for the optional AI route
+    ai_rate_limit: str = "15/minute"  # reserved for the optional AI route
 
     @property
     def ai_model(self) -> str:

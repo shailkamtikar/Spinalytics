@@ -121,8 +121,8 @@ def test_t_8_2_09_payload_has_no_identifier_and_stays_small(client, result, monk
 
 def test_t_8_2_10_rate_limit(client, result, monkeypatch):
     monkeypatch.setattr(ai, "ask", Fake())
-    codes = [post(client, result, "Why is C3 flagged?").status_code for _ in range(6)]
-    assert codes[:5] == [200] * 5 and codes[5] == 429
+    codes = [post(client, result, "Why is C3 flagged?").status_code for _ in range(16)]
+    assert codes[:15] == [200] * 15 and codes[15] == 429
 
 
 def test_t_8_2_11_oversized_question(client, result):
