@@ -1,0 +1,4 @@
+{
+  "note": "Approved references the assistant may cite. Empty until a reviewed list is supplied (playbook item C-3). Each entry needs: title, authors_or_organisation, year, publisher, identifier (DOI, PMID or stable URL), evidence_type, summary, provenance, retrieved_on. Only add references that a person has opened and verified.",
+  "sources": []
+}

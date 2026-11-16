@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import errors
-from app.api import analyze, health, info, samples
+from app.api import analyze, ask, health, info, samples
 from app.config import APP_VERSION, get_settings
 from app.limiter import limiter
 from app.middleware import BodySizeLimitMiddleware, SecurityHeadersMiddleware
@@ -30,7 +30,7 @@ def create_app() -> FastAPI:
     )
     app.state.limiter = limiter
     errors.install(app)
-    for router in (health.router, analyze.router, samples.router, info.router):
+    for router in (health.router, analyze.router, ask.router, samples.router, info.router):
         app.include_router(router)
     # added last = outermost: security headers wrap every response, then the size check, then CORS
     app.add_middleware(CORSMiddleware, allow_origins=get_settings().origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type"], max_age=600)

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode, Ref } from 'react'
 import { Link, type LinkProps } from 'react-router-dom'
 
 export type Status = 'within' | 'review' | 'large_deviation' | 'missing' | 'no_reference'
@@ -51,7 +51,7 @@ export function StatusBadge({ status, compact = false }: { status: Status; compa
   )
 }
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' }
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost'; ref?: Ref<HTMLButtonElement> }
 
 export function Button({ variant = 'primary', className = '', ...rest }: ButtonProps) {
   return <button type="button" className={`${BUTTON_BASE} ${BUTTON_STYLES[variant]} ${className}`} {...rest} />

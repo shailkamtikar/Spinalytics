@@ -31,6 +31,7 @@ export function kindForStatus(status: number): ApiErrorKind {
 }
 
 export function friendlyMessage(err: ApiError): string {
+  if (err.code.startsWith('ai_')) return err.message // the backend words these calmly: the assistant is optional
   switch (err.kind) {
     case 'network':
       return 'Cannot reach the server. Check your connection and try again.'
