@@ -10,7 +10,7 @@ test('shows API ok when the backend answers', async () => {
     vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: 'ok', version: '0.1.0', ai_assistant_configured: false }) }),
   )
   render(<App />)
-  expect(screen.getByRole('link', { name: 'Spinalytics home' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Spinalytics' })).toBeInTheDocument()
   expect(await screen.findByText('API: ok')).toBeInTheDocument()
 })
 

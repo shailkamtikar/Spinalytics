@@ -13,12 +13,14 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-30 border-b border-rule bg-bg/95 backdrop-blur-[2px]">
       <div className="mx-auto flex max-w-[1280px] items-center gap-4 px-6 py-3 lg:px-10">
-        <Link to="/" className="mr-auto flex items-baseline gap-3" aria-label="Spinalytics home">
-          <span className="font-display text-2xl leading-none">Spinalytics</span>
+        <div className="mr-auto flex items-baseline gap-3">
+          <Link to="/" className="font-display text-2xl leading-none">
+            Spinalytics
+          </Link>
           <span className="max-sm:hidden">
             <SyntheticBadge />
           </span>
-        </Link>
+        </div>
         <nav aria-label="Primary" className="hidden items-center gap-6 sm:flex">
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} className={({ isActive }) => `font-mono text-[0.75rem] uppercase tracking-[0.16em] ${isActive ? 'text-text' : 'text-muted hover:text-text'}`}>

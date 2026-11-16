@@ -160,6 +160,7 @@ export default function SpineScene({ layout, statuses, selected = null, onSelect
       gl={{ alpha: true, antialias: true }}
       camera={{ position: [0, 0, homeDistance(layout)], fov: 35, near: 0.1, far: 200 }}
       onPointerMissed={() => interactive && onSelect?.(null)}
+      role="img"
       aria-label="Three-dimensional schematic spine. A level list and a table next to it give the same information as text."
     >
       <ambientLight intensity={0.7} />

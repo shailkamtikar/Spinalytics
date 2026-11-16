@@ -134,7 +134,7 @@ export function SpineSchematic({ spread = 0, spreadValue, statuses, selected = n
         <Slot key={slot.level} slot={slot} spread={driver} status={statuses?.[slot.level]} selected={selected === slot.level} onSelect={onSelect} />
       ))}
       {labels && SLOTS.filter((s) => s.kind === 'vertebra').map((s) => <LevelLabel key={`t-${s.level}`} slot={s} spread={driver} />)}
-      <rect x={78} y={BOTTOM + 4} width={64} height={26} rx={4} fill="none" stroke="var(--muted)" strokeDasharray="3 3" data-level="sacrum" data-measured="false" aria-label="Sacrum, not measured" />
+      <rect x={78} y={BOTTOM + 4} width={64} height={26} rx={4} fill="none" stroke="var(--muted)" strokeDasharray="3 3" data-level="sacrum" data-measured="false"><title>Sacrum, not measured</title></rect>
     </svg>
   )
 }

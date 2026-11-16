@@ -42,7 +42,8 @@ export default function Landing() {
 
   // The 3D scene is requested only when the browser is idle, so text and the action are usable first.
   useEffect(() => {
-    if (reduced) return
+    // phones show the 2D figure only, so they never download the 3D scene
+    if (reduced || !window.matchMedia?.('(min-width: 1024px)').matches) return
     const load = () => loadReferenceInfo().then(setReference, () => {})
     const idle = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
     const id = idle ? idle(load, { timeout: 2500 }) : window.setTimeout(load, 1200)
@@ -87,15 +88,17 @@ export default function Landing() {
             </Reveal>
             <ol className="mt-10 space-y-10">
               {STEPS.map((s, i) => (
-                <Reveal key={s.n} delay={i * 0.05}>
-                  <li className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-rule pt-5">
-                    <span className="font-mono text-2xl text-accent">{s.n}</span>
-                    <div>
-                      <h3 className="text-2xl">{s.title}</h3>
-                      <p className="mt-2 max-w-[34rem] text-muted">{s.body}</p>
+                <li key={s.n}>
+                  <Reveal delay={i * 0.05}>
+                    <div className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-rule pt-5">
+                      <span className="font-mono text-2xl text-accent">{s.n}</span>
+                      <div>
+                        <h3 className="text-2xl">{s.title}</h3>
+                        <p className="mt-2 max-w-[34rem] text-muted">{s.body}</p>
+                      </div>
                     </div>
-                  </li>
-                </Reveal>
+                  </Reveal>
+                </li>
               ))}
             </ol>
           </section>
