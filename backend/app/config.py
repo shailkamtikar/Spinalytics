@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 APP_VERSION = "0.1.0"
-DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite"
+GEMINI_MODEL = "gemini-3.5-flash-lite"  # fixed on purpose: not read from the environment
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=ROOT_DIR / ".env", env_file_encoding="utf-8", extra="ignore")
 
     gemini_api_key: str = ""
-    gemini_model: str = ""
     allowed_origins: str = "http://localhost:5173"  # comma-separated; no wildcard
     max_body_bytes: int = 256 * 1024
     analyze_rate_limit: str = "30/minute"  # per client IP
@@ -36,8 +35,8 @@ class Settings(BaseSettings):
 
     @property
     def ai_model(self) -> str:
-        """Model name from GEMINI_MODEL, or a default that can be overridden without code changes."""
-        return self.gemini_model.strip() or DEFAULT_GEMINI_MODEL
+        """The assistant always uses this one model, whatever the environment says."""
+        return GEMINI_MODEL
 
     @property
     def origins(self) -> list[str]:

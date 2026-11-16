@@ -1,5 +1,5 @@
 # Render blueprint: one free web service for the backend.
-# The Gemini key is NOT stored here. Set GEMINI_API_KEY (and optionally GEMINI_MODEL) in the Render dashboard.
+# The Gemini key is NOT stored here. Set GEMINI_API_KEY in the Render dashboard.
 services:
   - type: web
     name: spinalytics-api
@@ -17,5 +17,3 @@ services:
         value: http://localhost:5173 # replace with the Vercel address after the first frontend deploy
       - key: GEMINI_API_KEY
         sync: false # secret: enter it in the dashboard
-      - key: GEMINI_MODEL
-        sync: false

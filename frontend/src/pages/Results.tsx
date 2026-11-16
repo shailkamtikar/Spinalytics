@@ -5,11 +5,12 @@ import { AskPanel } from '../features/assistant/AskPanel'
 import { Button, ButtonLink, Caption, Label, Rule } from '../components/ui'
 import { FindingsTable } from '../features/results/FindingsTable'
 import { LevelList } from '../features/results/LevelList'
-import { DetailsPanel, ModelPanel, ProvenancePanel, Summary } from '../features/results/Panels'
+import { ModelPanel, ProvenancePanel, Summary } from '../features/results/Panels'
 import { statusMap, strongestFinding, useInfo } from '../features/results/selectors'
 import { SpineFigure } from '../features/spine3d/SpineFigure'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { OVERALL_LABEL } from '../domain/wording'
+import { LevelSummaryCard } from '../features/results/LevelSummaryCard'
 import { useAnalysisStore } from '../state/analysisStore'
 
 // Recharts is only needed on this page, so it loads as its own chunk after the first paint.
@@ -71,8 +72,9 @@ export default function Results() {
 
       <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         <figure className="lg:sticky lg:top-20 lg:self-start">
-          <div className="h-[30rem] lg:h-[34rem]">
+          <div className="relative h-[30rem] lg:h-[34rem]">
             <SpineFigure reference={reference} statuses={statuses} selected={selected} onSelect={selectLevel} controls />
+            {selected && <LevelSummaryCard level={selected} status={statuses[selected]} findings={findings} model={result.model} onClose={() => selectLevel(null)} />}
           </div>
           <Caption label="FIG. 1">Schematic spine. Sizes from the synthetic reference; not anatomically exact. Colour and glyph show each level's status. C1 and C2 are outlines, not measured.</Caption>
           <div className="mt-4">
@@ -98,7 +100,6 @@ export default function Results() {
               />
             )}
           </div>
-          <DetailsPanel level={selected} findings={findings} onClear={() => selectLevel(null)} />
           <div>
             <Rule number="A" title="Deviation by level" />
             <div className="mt-4">

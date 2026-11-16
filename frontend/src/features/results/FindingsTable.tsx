@@ -21,9 +21,13 @@ export function FindingsTable({ findings, selectedLevel, focusColumn, onSelect }
   const filter: FindingFilter = { region, sort, statuses }
   const rows = useMemo(() => selectFindings([...findings], filter), [findings, region, sort, statuses]) // eslint-disable-line react-hooks/exhaustive-deps
   const firstOfLevel = useRef<HTMLTableRowElement | null>(null)
+  const scrollBox = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    firstOfLevel.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' })
+    // scroll inside the table box only: the page must stay where the reader clicked
+    const row = firstOfLevel.current
+    const box = scrollBox.current
+    if (row && box) box.scrollTo?.({ top: Math.max(0, row.offsetTop - box.clientHeight / 3), behavior: 'smooth' })
   }, [selectedLevel])
 
   const toggle = (s: Status) =>
@@ -68,7 +72,7 @@ export function FindingsTable({ findings, selectedLevel, focusColumn, onSelect }
         <p className="ml-auto font-mono text-xs text-muted" aria-live="polite">{rows.length} of {findings.length} rows</p>
       </div>
 
-      <div className="max-h-[34rem] overflow-auto border border-rule">
+      <div ref={scrollBox} className="relative max-h-[34rem] overflow-auto border border-rule">
         <table className="w-full min-w-[56rem] border-collapse text-left text-sm" data-testid="findings-table">
           <thead className="sticky top-0 bg-surface font-mono text-[0.68rem] uppercase tracking-[0.12em] text-muted">
             <tr className="border-b border-rule">

@@ -121,7 +121,7 @@ test('T-7.3-05 Escape clears the selection', async () => {
   act(() => useAnalysisStore.getState().selectLevel('T7'))
   expect(screen.getByRole('heading', { name: 'T7' })).toBeInTheDocument()
   await userEvent.keyboard('{Escape}')
-  expect(screen.getByRole('heading', { name: 'Nothing selected' })).toBeInTheDocument()
+  expect(screen.queryByTestId('level-summary')).toBeNull()
 })
 
 test('T-7.3-07 keyboard: arrow keys in the level list move the selection', async () => {

@@ -103,6 +103,12 @@ function CameraRig({ layout, selected, apiRef, controls }: { layout: SpineLayout
   const { camera } = useThree()
   const home = useMemo(() => new THREE.Vector3(0, 0, homeDistance(layout)), [layout])
   const wanted = useRef(new THREE.Vector3())
+  const animUntil = useRef(0)
+
+  // every selection change starts a short camera move: pan to the part and zoom in on it (or back out when cleared)
+  useEffect(() => {
+    animUntil.current = performance.now() + 1600
+  }, [selected])
 
   useEffect(() => {
     if (!apiRef) return
@@ -132,6 +138,13 @@ function CameraRig({ layout, selected, apiRef, controls }: { layout: SpineLayout
     const item = selected ? layout.items.find((i) => i.level === selected) : null
     wanted.current.set(item ? item.position[0] : 0, item ? item.position[1] : 0, 0)
     const delta = wanted.current.clone().sub(c.target)
+    if (performance.now() > animUntil.current) return // after the move the reader is free to orbit, zoom and pan
+    const dist = camera.position.distanceTo(c.target)
+    const desired = item ? Math.max(2.2, item.size.width * 2.4) : homeDistance(layout)
+    if (Math.abs(dist - desired) > 0.01) {
+      const dir = camera.position.clone().sub(c.target).normalize()
+      camera.position.copy(c.target).addScaledVector(dir, dist + (desired - dist) * 0.1)
+    }
     if (delta.lengthSq() > 1e-6) {
       delta.multiplyScalar(0.08)
       c.target.add(delta)

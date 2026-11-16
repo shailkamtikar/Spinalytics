@@ -16,7 +16,7 @@ KEY = "test-secret-key-0042"
 @pytest.fixture(autouse=True)
 def _configured(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", KEY)
-    monkeypatch.setenv("GEMINI_MODEL", "test-model")
+    monkeypatch.setenv("GEMINI_MODEL", "some-other-model")  # must be ignored: the model is fixed
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()
@@ -53,7 +53,7 @@ def test_t_8_2_01_in_scope_question(client, result, monkeypatch):
     body = r.json()
     assert r.status_code == 200 and body["ai_generated"] is True and "reference" in body["answer"]
     assert "AI-generated" in body["label"] and len(fake.calls) == 1
-    assert fake.calls[0]["api_key"] == KEY and fake.calls[0]["model"] == "test-model"
+    assert fake.calls[0]["api_key"] == KEY and fake.calls[0]["model"] == "gemini-3.5-flash-lite"
 
 
 def test_t_8_2_02_out_of_scope_makes_no_call(client, result, monkeypatch):
