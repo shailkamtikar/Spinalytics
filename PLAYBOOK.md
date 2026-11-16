@@ -1551,12 +1551,12 @@ git push origin m6.3
 
 | Item | Record |
 |---|---|
-| Completed milestones | 6.1 ☐ 6.2 ☐ 6.3 ☐ |
-| Tests passed | __ / 39 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | Case 2 analysed via sample, CSV and manual entry gives identical findings ☐ |
-| Go / No-Go | Go only if no input path silently alters or fills a value |
+| Completed milestones | 6.1 ☑ 6.2 ☑ 6.3 ☑ (committed together as one phase commit) |
+| Tests passed | 29 new frontend tests, 62 / 62 in the frontend suite (CSV parsing, template round trip, sample / CSV / manual paths, review step, double click, wording, form validation, region tab state); production build passes |
+| Known issues | CSV test files are built in code from the backend sample cases instead of committed fixture files, which keeps the repository free of data files. Typing-speed (T-6.3-11) and screen-reader (T-6.3-12) checks were limited to label queries in tests |
+| Git commit / hash | recorded in the merge commit `phase-6-done` |
+| Overall phase verification | Sample case 2 analysed in the browser against the real backend, reaching "Unusual pattern detected". CSV built from case 2 and the sample request carry identical values (test), and the manual path sends the prefilled values ☑ |
+| Go / No-Go | Go: no input path fills or changes a value; invalid cells become missing with a visible note, and empty form fields are omitted |
 
 ```powershell
 git checkout main
