@@ -149,3 +149,25 @@ class StatisticalResult(BaseModel):
     thresholds: Thresholds
     provenance: dict[str, Any]
     disclaimer: str = DISCLAIMER
+
+
+class Contributor(BaseModel):
+    group: str
+    target_type: Literal["vertebra", "disc", "region", "person"]
+    level: Optional[str] = None
+    columns: list[str] = Field(default_factory=list)
+    logit_change: float = 0.0  # same comparison on the log-odds scale; used for ranking
+    change: float  # score with the group as measured minus score with the group replaced by a typical value
+
+
+class ModelResult(BaseModel):
+    status: Literal["ok", "insufficient_data", "out_of_distribution", "unavailable"]
+    label: Optional[Literal["within_reference", "unusual_pattern", "indeterminate"]] = None
+    score: Optional[float] = None
+    band_low: Optional[float] = None
+    band_high: Optional[float] = None
+    person_context_used: Optional[bool] = None
+    missing_count: Optional[int] = None
+    out_of_range_count: Optional[int] = None
+    contributors: list[Contributor] = Field(default_factory=list)
+    message: str = ""

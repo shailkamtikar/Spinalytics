@@ -922,12 +922,12 @@ git push origin m3.3
 
 | Item | Record |
 |---|---|
-| Completed milestones | 3.1 ☐ 3.2 ☐ 3.3 ☐ |
-| Tests passed | __ / 31 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | From a clean clone plus regenerated data, `train_model.py` reproduces the committed metrics ☐ |
-| Go / No-Go | Go only if T-3.2-03, T-3.2-04, T-3.2-05 and T-3.3-09 pass |
+| Completed milestones | 3.1 ☑ 3.2 ☑ 3.3 ☑ (committed together as one phase commit) |
+| Tests passed | 37 new tests, 151 / 151 in the full suite; all 31 playbook cases covered |
+| Known issues | Occlusion explanation is weak when a pattern spans several levels and the score saturates near 1 (reported on both score and log-odds scale). A spine-only model variant was added so a score is still possible when person fields are not all supplied (not in the original playbook). Last-digit floating-point differences in random forest metrics are removed by rounding the report to 6 decimals |
+| Git commit / hash | recorded in the merge commit `phase-3-done` |
+| Overall phase verification | `train_model.py` run twice reproduces the committed candidate and test metrics exactly. Selected gradient boosting: validation ROC-AUC 0.862, test ROC-AUC 0.872, shuffled-label control 0.495, spine-only ablation 0.842, person-only 0.677, calibration max bin gap 0.031 ☑ |
+| Go / No-Go | Go: T-3.2-03, T-3.2-04, T-3.2-05 and T-3.3-09 pass; no test is skipped |
 
 ```powershell
 git checkout main
