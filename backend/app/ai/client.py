@@ -9,7 +9,7 @@ import logging
 log = logging.getLogger("spinalytics.ai")
 
 ASK_TIMEOUT_SECONDS = 60.0
-MAX_OUTPUT_TOKENS = 600
+MAX_OUTPUT_TOKENS = 2000
 
 
 class AiNotConfigured(Exception):
@@ -55,7 +55,7 @@ def ask(system: str, context_json: str, history: list[dict], question: str, *, a
             response = client.models.generate_content(
                 model=model,
                 contents=_contents(context_json, history, question),
-                config=types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=MAX_OUTPUT_TOKENS, thinking_config=types.ThinkingConfig(thinking_level="LOW")),
+                config=types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=MAX_OUTPUT_TOKENS, thinking_config=types.ThinkingConfig(thinking_level="MINIMAL")),
             )
             text = (response.text or "").strip()
             break
