@@ -7,18 +7,15 @@ afterEach(() => vi.unstubAllGlobals())
 test('shows API ok when the backend answers', async () => {
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ status: 'ok', version: '0.1.0', ai_assistant_configured: false }),
-    }),
+    vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: 'ok', version: '0.1.0', ai_assistant_configured: false }) }),
   )
   render(<App />)
-  expect(screen.getByRole('heading', { name: 'Spinalytics' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Spinalytics home' })).toBeInTheDocument()
   expect(await screen.findByText('API: ok')).toBeInTheDocument()
 })
 
 test('shows API unreachable when the backend is down', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('network down')))
   render(<App />)
   expect(await screen.findByText('API: unreachable')).toBeInTheDocument()
 })
