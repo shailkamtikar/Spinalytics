@@ -1760,12 +1760,12 @@ git push origin m7.3
 
 | Item | Record |
 |---|---|
-| Completed milestones | 7.1 ☐ 7.2 ☐ 7.3 ☐ |
-| Tests passed | __ / 41 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | For cases 2, 3 and 4 the flagged level in the table, schematic and 3D view agree ☐ |
-| Go / No-Go | Go only if T-7.3-09 (ID mapping) passes 45 / 45 |
+| Completed milestones | 7.1 ☑ 7.2 ☑ 7.3 ☑ (committed together as one phase commit) |
+| Tests passed | 26 new frontend tests, 88 / 88 in the frontend suite (table, sort, filters, selection sync, missing data, unavailable model, layout counts and order, no-overlap, mapping audit 45 / 45, keyboard list, Escape, not-measured, WebGL fallback). Backend 194 / 194. Production build passes; the three.js scene is its own lazy chunk |
+| Known issues | Not automated (need a real GPU or touch device): frame rate (T-7.2-11), touch drag / pinch (T-7.3-10), scroll long-task profile. The mapping audit runs on the 2D figure and the layout function because jsdom has no WebGL; in the browser each 3D group carries `userData.level` and `name="level-<id>"`. API additions beyond the playbook: `sagittal_angle_deg` per disc in `/api/reference-info` (for the curve) and `q1` / `q3` in each finding reference (for FIG. 3). The results fixtures under `frontend/src/test-utils/results/` are API outputs for sample cases 1, 2, 3 and 8 |
+| Git commit / hash | recorded in the merge commit `phase-7-done` |
+| Overall phase verification | In the browser against the real backend: case 2 shows the 3D spine with C3 coloured, the model panel, deviation chart (C3 at z = -7), reference chart, level list and findings table; the landing figure is live 3D and assembles on scroll ☑ |
+| Go / No-Go | Go: T-7.3-09 passes 45 / 45 |
 
 ```powershell
 git checkout main

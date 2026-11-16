@@ -433,6 +433,10 @@ export interface components {
             mean: number;
             /** Median */
             median: number;
+            /** Q1 */
+            q1: number;
+            /** Q3 */
+            q3: number;
             /** Sd */
             sd: number;
             /** Interval Low */

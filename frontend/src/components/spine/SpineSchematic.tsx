@@ -65,7 +65,7 @@ function Slot({ slot, spread, status, selected, onSelect }: { slot: Slot; spread
   const y = useTransform(spread, (v) => (slot.index - MID) * SPREAD_STEP * v)
   const measured = !UNMEASURED.includes(slot.level)
   const color = !measured ? 'var(--muted)' : status === 'within' ? 'var(--within)' : status === 'review' ? 'var(--review)' : status === 'large_deviation' ? 'var(--large)' : status === 'missing' || status === 'no_reference' ? 'var(--missing)' : 'var(--bone)'
-  const interactive = Boolean(onSelect) && measured
+  const interactive = Boolean(onSelect)
   const label = `${slot.level}${measured ? '' : ', not measured in this version'}${status ? `, ${status.replace('_', ' ')}` : ''}`
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {

@@ -76,14 +76,16 @@ test('T-6.1-07 a double click sends one request', async () => {
   expect(calls.filter((c) => c.url === '/api/analyze')).toHaveLength(1)
 })
 
-test('T-6.1-08 result wording never says healthy, disease or diagnosis outside the notice', async () => {
+test('T-6.1-08 result wording never says healthy, disease or diagnosis outside the required disclaimers', async () => {
   mockApi()
   visit('/analyze')
   await userEvent.click(await screen.findByRole('button', { name: /use case 1/i }))
   await userEvent.click(await screen.findByRole('button', { name: /analyse spine/i }))
   await screen.findByRole('heading', { level: 1, name: 'Within reference pattern' })
   const main = document.getElementById('main')!
-  expect(main.textContent).not.toMatch(/healthy|disease|diagnosis/i)
+  // the two required disclaimers are the only places these words may appear
+  const text = main.textContent!.replace(/not the probability of disease/gi, '').replace(/does not provide a diagnosis/gi, '')
+  expect(text).not.toMatch(/healthy|disease|diagnosis/i)
 })
 
 test('T-6.3-01 the form covers 204 spine fields plus 16 optional person fields, with units', async () => {

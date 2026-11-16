@@ -37,7 +37,7 @@ def make_finding(column: str, value: float | None, reference: Reference, cohort:
     ref = reference.stats(cohort, column)
     if ref is None:
         return Finding(**base, value=value, status="no_reference", flags=["no_reference"])
-    summary = ReferenceSummary(cohort=cohort, n=ref["n"], mean=ref["mean"], median=ref["median"], sd=ref["sd"], interval_low=ref["p02_5"], interval_high=ref["p97_5"])
+    summary = ReferenceSummary(cohort=cohort, n=ref["n"], mean=ref["mean"], median=ref["median"], q1=ref["q1"], q3=ref["q3"], sd=ref["sd"], interval_low=ref["p02_5"], interval_high=ref["p97_5"])
     s = compute_stats(value, ref["mean"], ref["sd"], info.kind, cfg)
     flags = ["reference_unusable"] if s["z_score"] is None else []
     percentile = percentile_from_grid(value, reference.quantiles(cohort, column), reference.probabilities)
