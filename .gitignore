@@ -15,3 +15,6 @@ data/
 .vscode/
 .DS_Store
 SPINALYTICS_KNOWLEDGE.md
+
+# The downloadable CSV template (header and one synthetic example row) is the one CSV that belongs in the repository.
+!frontend/public/spinalytics_template.csv
