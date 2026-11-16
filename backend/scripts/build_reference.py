@@ -59,7 +59,7 @@ def build_reference(df: pd.DataFrame, split: np.ndarray, provenance_extra: dict 
         "provenance": {
             "data_origin": "synthetic",
             "limitation": LIMITATION,
-            "cohort_rule": "train split, is_healthy == 1",
+            "cohort_rule": "training rows with a healthy-like profile",
             "cohorts": {"all": "both sexes pooled", "sex_male_0": "sex_male == 0", "sex_male_1": "sex_male == 1"},
             "reference_interval_method": "nonparametric central 95% (2.5th to 97.5th percentile)",
             "measurement_method": "simulated measurements with added noise",

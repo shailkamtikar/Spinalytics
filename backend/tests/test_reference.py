@@ -153,7 +153,7 @@ def test_provenance_block(committed):
     p = committed["provenance"]
     assert p["data_origin"] == "synthetic"
     assert p["limitation"] == "Synthetic development reference. Not a clinical reference range."
-    assert p["cohort_rule"] == "train split, is_healthy == 1"
+    assert p["cohort_rule"] == "training rows with a healthy-like profile"
     assert p["dataset_rows"] == 50_000 and len(p["dataset_sha256"]) == 64
 
 
@@ -165,4 +165,6 @@ def test_artifact_size_is_deployable():
 def test_committed_reference_is_reproducible_from_the_dataset(committed, tmp_path):
     out = tmp_path / "ref.json"
     assert B.main(["--out", str(out)]) == 0
-    assert json.loads(out.read_text(encoding="utf-8")) == committed
+    rebuilt = json.loads(out.read_text(encoding="utf-8"))
+    # the overall_rule block is added afterwards by calibrate_overall_rule.py
+    assert rebuilt == {k: v for k, v in committed.items() if k != "overall_rule"}
