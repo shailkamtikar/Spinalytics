@@ -1346,12 +1346,12 @@ git push origin m5.3
 
 | Item | Record |
 |---|---|
-| Completed milestones | 5.1 ☐ 5.2 ☐ 5.3 ☐ |
-| Tests passed | __ / 31 |
-| Known issues | |
-| Git commit / hash | |
-| Overall phase verification | Landing reviewed in both themes at 1440, 768 and 375 px; reduced motion checked ☐ |
-| Go / No-Go | Go only if contrast (T-5.1-05) and reduced motion (T-5.2-04) pass |
+| Completed milestones | 5.1 ☑ 5.2 ☑ 5.3 ☑ (committed together as one phase commit) |
+| Tests passed | 33 frontend tests (automated: theme, contrast, hard-coded colours, fonts, status glyphs, schematic structure, routes, footer notice, client, store, waking state, timeout, no web storage). Production build passes |
+| Known issues | Browser-only cases not automated: scroll smoothness profile (T-5.2-10), 768 px layout (T-5.2-06) and reduced-motion emulation (T-5.2-04, covered only by code path and unit logic). `openapi-typescript` cannot run on TypeScript 7 (the native compiler has no JavaScript API), so `npm run gen:api` runs it through `npx` with TypeScript 5 and the package is not a project dependency. `@testing-library/dom` and `user-event` were added as test dependencies. No 21st.dev source was copied, so no THIRD_PARTY entry exists |
+| Git commit / hash | recorded in the merge commit `phase-5-done` |
+| Overall phase verification | Landing checked in the browser in dark and light themes at desktop and 375 px width (no horizontal overflow after a fix); scroll assembles the figure and the caption changes ☑ |
+| Go / No-Go | Go: contrast test T-5.1-05 passes (both themes, 15 pairs each). Reduced-motion path exists in code (static spread, plain reveals) |
 
 ```powershell
 git checkout main

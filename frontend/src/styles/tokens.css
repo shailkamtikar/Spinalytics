@@ -1,0 +1,33 @@
+/* Design tokens. Components read these variables and never contain a raw colour. */
+:root,
+:root[data-theme='dark'] {
+  --bg: #0f1416;
+  --surface: #161d20;
+  --rule: #2a3438;
+  --text: #e9e4d8;
+  --muted: #9aa39f;
+  --accent: #7fb3a6;
+  --on-accent: #0f1416;
+  --within: #86b08e;
+  --review: #d6b25e;
+  --large: #d9826c;
+  --missing: #8e989b;
+  --bone: #d9d2c0;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f3efe6;
+  --surface: #fbf8f1;
+  --rule: #d8d2c4;
+  --text: #1b2326;
+  --muted: #5a6462;
+  --accent: #2b6a5e;
+  --on-accent: #fbf8f1;
+  --within: #3a7447;
+  --review: #8a6410;
+  --large: #a8452f;
+  --missing: #5f6a6a;
+  --bone: #8a826e;
+  color-scheme: light;
+}
